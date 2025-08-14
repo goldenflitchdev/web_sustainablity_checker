@@ -11,6 +11,7 @@ interface SustainabilityReport {
   accessibility: number;
   recommendations: string[];
   timestamp: string;
+  analysisMethod?: 'real' | 'simulated';
   analysisData: {
     url: string;
     loadTime: number;
@@ -39,6 +40,20 @@ export default function Home() {
     e.preventDefault();
     if (!url) return;
 
+    // Auto-format URL if protocol is missing
+    let formattedUrl = url.trim();
+    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+      formattedUrl = `https://${formattedUrl}`;
+    }
+
+    // Basic URL validation
+    try {
+      new URL(formattedUrl);
+    } catch {
+      setError('Please enter a valid website URL');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
     setReport(null);
@@ -49,7 +64,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ payload: { url } }),
+        body: JSON.stringify({ payload: { url: formattedUrl } }),
       });
 
       if (!response.ok) {
@@ -125,14 +140,30 @@ export default function Home() {
         {/* URL Input Form */}
         <div className="max-w-2xl mx-auto mb-12">
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
-            <input
-              type="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="Enter website URL (e.g., https://example.com)"
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
+            <div className="flex-1">
+              <input
+                type="text"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="Enter website URL (e.g., example.com or https://example.com)"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+              <p className="text-sm text-gray-500 mt-2">
+                💡 You can enter just the domain (e.g., "example.com") - we'll add https:// automatically
+              </p>
+              {url && (
+                <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
+                  <p className="text-xs text-blue-700">
+                    <span className="font-medium">Will analyze:</span> {
+                      url.startsWith('http://') || url.startsWith('https://') 
+                        ? url 
+                        : `https://${url}`
+                    }
+                  </p>
+                </div>
+              )}
+            </div>
             <button
               type="submit"
               disabled={isLoading}
@@ -170,6 +201,18 @@ export default function Home() {
                 <p className="text-gray-600">
                   Analyzed on {report.timestamp}
                 </p>
+                {report.analysisMethod && (
+                  <div className={`mt-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                    report.analysisMethod === 'real' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    <div className={`w-2 h-2 rounded-full mr-2 ${
+                      report.analysisMethod === 'real' ? 'bg-green-500' : 'bg-yellow-500'
+                    }`}></div>
+                    {report.analysisMethod === 'real' ? 'Real-time Analysis' : 'Simulated Analysis'}
+                  </div>
+                )}
               </div>
 
               <div className="text-center mb-8">
@@ -332,6 +375,26 @@ export default function Home() {
             {/* Recommendations */}
             <div className="bg-white rounded-xl shadow-lg p-8">
               <h3 className="text-2xl font-bold text-gray-800 mb-6">Recommendations</h3>
+              
+              {report.analysisMethod === 'simulated' && (
+                <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h4 className="text-sm font-medium text-yellow-800">Simulated Analysis</h4>
+                      <p className="text-sm text-yellow-700 mt-1">
+                        This analysis uses simulated data because the website couldn't be accessed directly. 
+                        For accurate results, ensure the website allows external analysis or try a different URL.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <ul className="space-y-4">
                 {report.recommendations.map((rec, index) => (
                   <li key={index} className="flex items-start gap-4 p-4 bg-blue-50 rounded-lg">
