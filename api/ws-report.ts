@@ -22,30 +22,50 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let analysisMethod: 'real' | 'simulated' = 'real';
     
     try {
+      console.log('Attempting real website analysis for:', url);
       const analyzer = new WebsiteAnalyzer();
       websiteData = await analyzer.analyzeWebsite(url);
+      console.log('Real analysis successful');
     } catch (analysisError) {
       console.warn('Real analysis failed, using simulated data:', analysisError);
       
       // Provide simulated analysis as fallback
-      websiteData = await generateSimulatedAnalysis(url);
-      analysisMethod = 'simulated';
+      try {
+        websiteData = await generateSimulatedAnalysis(url);
+        analysisMethod = 'simulated';
+        console.log('Simulated analysis generated successfully');
+      } catch (simulationError) {
+        console.error('Both real and simulated analysis failed:', simulationError);
+        return res.status(500).json({ 
+          error: "Unable to analyze website. Please try a different URL or check if the website is accessible." 
+        });
+      }
     }
     
     // Generate sustainability report
-    const report = await generateSustainabilityReport(websiteData, analysisMethod);
+    try {
+      const report = await generateSustainabilityReport(websiteData, analysisMethod);
+      console.log('Sustainability report generated successfully');
 
-    return res.status(200).json({
-      choices: [{
-        message: {
-          content: JSON.stringify(report)
-        }
-      }]
-    });
+      return res.status(200).json({
+        choices: [{
+          message: {
+            content: JSON.stringify(report)
+          }
+        }]
+      });
+    } catch (reportError) {
+      console.error('Failed to generate sustainability report:', reportError);
+      return res.status(500).json({ 
+        error: "Analysis completed but failed to generate report. Please try again." 
+      });
+    }
 
   } catch (e: any) {
     console.error('API Error:', e);
-    return res.status(500).json({ error: e.message });
+    return res.status(500).json({ 
+      error: "An unexpected error occurred. Please try again later." 
+    });
   }
 }
 

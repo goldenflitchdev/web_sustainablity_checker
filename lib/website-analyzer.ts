@@ -1,5 +1,8 @@
 import { JSDOM } from 'jsdom';
 
+// Ensure fetch is available in Node.js environment
+const fetch = globalThis.fetch || require('node-fetch');
+
 export interface WebsiteAnalysis {
   url: string;
   loadTime: number;
@@ -25,12 +28,20 @@ export class WebsiteAnalyzer {
     try {
       const startTime = Date.now();
       
-      // Fetch the website
+      console.log('Starting website analysis for:', url);
+      
+      // Fetch the website with timeout and better error handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const response = await fetch(url, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; WebSustainabilityChecker/1.0)',
         },
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -39,6 +50,8 @@ export class WebsiteAnalyzer {
       const html = await response.text();
       const loadTime = Date.now() - startTime;
       const pageSize = new Blob([html]).size / 1024; // Size in KB
+
+      console.log(`Website fetched successfully: ${pageSize.toFixed(2)}KB, ${loadTime}ms`);
 
       // Parse HTML
       this.dom = new JSDOM(html);
@@ -62,6 +75,8 @@ export class WebsiteAnalyzer {
       const compressionEnabled = this.checkCompression(response);
       const cdnEnabled = this.checkCDN(url, response);
 
+      console.log('Analysis completed successfully');
+
       return {
         url,
         loadTime,
@@ -81,6 +96,18 @@ export class WebsiteAnalyzer {
       };
     } catch (error) {
       console.error('Website analysis error:', error);
+      
+      // Provide more specific error messages
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new Error('Website analysis timed out. The website took too long to respond.');
+        } else if (error.message.includes('fetch')) {
+          throw new Error('Unable to fetch website. The website may be blocking external requests or unavailable.');
+        } else if (error.message.includes('HTTP')) {
+          throw new Error(`Website returned an error: ${error.message}`);
+        }
+      }
+      
       throw new Error(`Failed to analyze website: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
