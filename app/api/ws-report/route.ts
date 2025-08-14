@@ -1,12 +1,14 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { WebsiteAnalyzer, WebsiteAnalysis } from "../lib/website-analyzer";
+import { NextRequest, NextResponse } from "next/server";
+import { WebsiteAnalyzer, WebsiteAnalysis } from "../../../lib/website-analyzer";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
-
+export async function POST(request: NextRequest) {
   try {
-    const { payload } = req.body || {};
-    if (!payload?.url) return res.status(400).json({ error: "Missing URL" });
+    const body = await request.json();
+    const { payload } = body || {};
+    
+    if (!payload?.url) {
+      return NextResponse.json({ error: "Missing URL" }, { status: 400 });
+    }
 
     const url = payload.url;
     
@@ -14,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       new URL(url);
     } catch {
-      return res.status(400).json({ error: "Invalid URL format" });
+      return NextResponse.json({ error: "Invalid URL format" }, { status: 400 });
     }
     
     // Try to analyze the website, but provide fallback if it fails
@@ -36,9 +38,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.log('Simulated analysis generated successfully');
       } catch (simulationError) {
         console.error('Both real and simulated analysis failed:', simulationError);
-        return res.status(500).json({ 
+        return NextResponse.json({ 
           error: "Unable to analyze website. Please try a different URL or check if the website is accessible." 
-        });
+        }, { status: 500 });
       }
     }
     
@@ -47,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const report = await generateSustainabilityReport(websiteData, analysisMethod);
       console.log('Sustainability report generated successfully');
 
-      return res.status(200).json({
+      return NextResponse.json({
         choices: [{
           message: {
             content: JSON.stringify(report)
@@ -56,16 +58,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     } catch (reportError) {
       console.error('Failed to generate sustainability report:', reportError);
-      return res.status(500).json({ 
+      return NextResponse.json({ 
         error: "Analysis completed but failed to generate report. Please try again." 
-      });
+      }, { status: 500 });
     }
 
   } catch (e: any) {
     console.error('API Error:', e);
-    return res.status(500).json({ 
+    return NextResponse.json({ 
       error: "An unexpected error occurred. Please try again later." 
-    });
+    }, { status: 500 });
   }
 }
 
