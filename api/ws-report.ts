@@ -1,39 +1,235 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { WebsiteAnalyzer, WebsiteAnalysis } from "@/lib/website-analyzer";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {
     const { payload } = req.body || {};
-    if (!payload) return res.status(400).json({ error: "Missing payload" });
+    if (!payload?.url) return res.status(400).json({ error: "Missing URL" });
 
-    const SYSTEM_PROMPT = `
-You are a Web Sustainability Reporter.
-... (same prompt as above) ...
-`;
+    const url = payload.url;
+    
+    // Validate URL format
+    try {
+      new URL(url);
+    } catch {
+      return res.status(400).json({ error: "Invalid URL format" });
+    }
+    
+    // Analyze the website for sustainability metrics
+    const analyzer = new WebsiteAnalyzer();
+    const websiteData = await analyzer.analyzeWebsite(url);
+    
+    // Generate sustainability report
+    const report = await generateSustainabilityReport(websiteData);
 
-    const r = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        temperature: 0,
-        top_p: 1,
-        seed: 42,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: JSON.stringify(payload) },
-        ],
-      }),
+    return res.status(200).json({
+      choices: [{
+        message: {
+          content: JSON.stringify(report)
+        }
+      }]
     });
 
-    const data = await r.json();
-    return res.status(200).json(data);
   } catch (e: any) {
+    console.error('API Error:', e);
     return res.status(500).json({ error: e.message });
   }
+}
+
+async function generateSustainabilityReport(websiteData: WebsiteAnalysis) {
+  // Calculate sustainability scores based on the analyzed data
+  const energyEfficiency = calculateEnergyEfficiency(websiteData);
+  const carbonFootprint = calculateCarbonFootprintScore(websiteData);
+  const resourceOptimization = calculateResourceOptimization(websiteData);
+  const accessibility = websiteData.accessibilityScore;
+  
+  // Calculate overall score (weighted average)
+  const overallScore = Math.round(
+    (energyEfficiency * 0.25) + 
+    (carbonFootprint * 0.25) + 
+    (resourceOptimization * 0.25) + 
+    (accessibility * 0.25)
+  );
+
+  // Generate recommendations based on scores
+  const recommendations = generateRecommendations(websiteData, {
+    energyEfficiency,
+    carbonFootprint,
+    resourceOptimization,
+    accessibility
+  });
+
+  return {
+    overallScore,
+    energyEfficiency,
+    carbonFootprint: carbonFootprint,
+    resourceOptimization,
+    accessibility,
+    recommendations,
+    analysisData: {
+      url: websiteData.url,
+      loadTime: websiteData.loadTime,
+      pageSize: websiteData.pageSize,
+      imageCount: websiteData.imageCount,
+      scriptCount: websiteData.scriptCount,
+      cssCount: websiteData.cssCount,
+      fontCount: websiteData.fontCount,
+      videoCount: websiteData.videoCount,
+      seoScore: websiteData.seoScore,
+      performanceScore: websiteData.performanceScore,
+      actualCarbonFootprint: websiteData.carbonFootprint,
+      greenHosting: websiteData.greenHosting,
+      compressionEnabled: websiteData.compressionEnabled,
+      cdnEnabled: websiteData.cdnEnabled,
+    }
+  };
+}
+
+function calculateEnergyEfficiency(data: WebsiteAnalysis): number {
+  let score = 100;
+  
+  // Penalize slow load times
+  if (data.loadTime > 3000) {
+    score -= Math.min(30, (data.loadTime - 3000) / 100);
+  } else if (data.loadTime > 2000) {
+    score -= Math.min(20, (data.loadTime - 2000) / 100);
+  }
+  
+  // Penalize large page sizes
+  if (data.pageSize > 2000) {
+    score -= Math.min(25, (data.pageSize - 2000) / 100);
+  } else if (data.pageSize > 1000) {
+    score -= Math.min(15, (data.pageSize - 1000) / 100);
+  }
+  
+  // Penalize excessive media content
+  if (data.videoCount > 2) {
+    score -= (data.videoCount - 2) * 5;
+  }
+  
+  // Bonus for optimization features
+  if (data.compressionEnabled) score += 5;
+  if (data.cdnEnabled) score += 5;
+  
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function calculateCarbonFootprintScore(data: WebsiteAnalysis): number {
+  // Convert actual carbon footprint to a score (lower carbon = higher score)
+  let score = 100;
+  
+  // Base scoring on carbon footprint
+  if (data.carbonFootprint > 2) {
+    score -= Math.min(40, (data.carbonFootprint - 2) * 20);
+  } else if (data.carbonFootprint > 1) {
+    score -= Math.min(20, (data.carbonFootprint - 1) * 20);
+  }
+  
+  // Bonus for green hosting
+  if (data.greenHosting) score += 10;
+  
+  // Bonus for optimization features
+  if (data.compressionEnabled) score += 5;
+  if (data.cdnEnabled) score += 5;
+  
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function calculateResourceOptimization(data: WebsiteAnalysis): number {
+  let score = 100;
+  
+  // Penalize excessive resources
+  if (data.scriptCount > 10) {
+    score -= (data.scriptCount - 10) * 3;
+  }
+  
+  if (data.cssCount > 5) {
+    score -= (data.cssCount - 5) * 4;
+  }
+  
+  if (data.fontCount > 3) {
+    score -= (data.fontCount - 3) * 5;
+  }
+  
+  // Penalize large page sizes
+  if (data.pageSize > 1500) {
+    score -= Math.min(20, (data.pageSize - 1500) / 100);
+  }
+  
+  // Bonus for optimization features
+  if (data.compressionEnabled) score += 5;
+  if (data.cdnEnabled) score += 5;
+  
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function generateRecommendations(data: WebsiteAnalysis, scores: any): string[] {
+  const recommendations: string[] = [];
+  
+  // Energy efficiency recommendations
+  if (scores.energyEfficiency < 80) {
+    if (data.loadTime > 2000) {
+      recommendations.push("Optimize page load time by reducing server response time and implementing lazy loading");
+    }
+    if (data.pageSize > 1000) {
+      recommendations.push("Compress and optimize images, minify CSS/JS files to reduce page size");
+    }
+    if (data.videoCount > 1) {
+      recommendations.push("Consider replacing videos with optimized images or implementing video lazy loading");
+    }
+    if (!data.compressionEnabled) {
+      recommendations.push("Enable gzip or Brotli compression on your server to reduce file sizes");
+    }
+    if (!data.cdnEnabled) {
+      recommendations.push("Implement a Content Delivery Network (CDN) to improve loading speeds globally");
+    }
+  }
+  
+  // Carbon footprint recommendations
+  if (scores.carbonFootprint < 80) {
+    if (!data.greenHosting) {
+      recommendations.push("Switch to a green hosting provider that runs on renewable energy");
+    }
+    if (data.pageSize > 1000) {
+      recommendations.push("Reduce page size by optimizing media files and removing unused code");
+    }
+    if (data.videoCount > 0) {
+      recommendations.push("Optimize video content and consider using lower resolution versions for mobile");
+    }
+  }
+  
+  // Resource optimization recommendations
+  if (scores.resourceOptimization < 80) {
+    if (data.scriptCount > 10) {
+      recommendations.push("Consolidate JavaScript files and remove unused scripts to reduce HTTP requests");
+    }
+    if (data.cssCount > 5) {
+      recommendations.push("Combine CSS files and remove unused styles to improve performance");
+    }
+    if (data.fontCount > 3) {
+      recommendations.push("Limit font families and use system fonts when possible to reduce loading time");
+    }
+    if (data.imageCount > 15) {
+      recommendations.push("Implement lazy loading for images and use modern formats like WebP");
+    }
+  }
+  
+  // Accessibility recommendations
+  if (scores.accessibility < 80) {
+    recommendations.push("Improve accessibility by adding proper alt text, semantic HTML, and keyboard navigation");
+    recommendations.push("Ensure sufficient color contrast and readable font sizes for better user experience");
+    recommendations.push("Add ARIA labels and roles where appropriate for screen readers");
+  }
+  
+  // General sustainability recommendations
+  recommendations.push("Implement caching strategies to reduce server load and improve user experience");
+  recommendations.push("Use modern image formats (WebP, AVIF) and responsive images for better performance");
+  recommendations.push("Consider implementing a service worker for offline functionality and reduced server requests");
+  recommendations.push("Regularly audit and remove unused code, images, and third-party scripts");
+  
+  // Remove duplicates and limit to top recommendations
+  const uniqueRecommendations = [...new Set(recommendations)];
+  return uniqueRecommendations.slice(0, 10);
 }
