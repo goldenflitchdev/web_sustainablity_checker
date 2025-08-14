@@ -2,5 +2,10 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "framework": "nextjs",
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "functions": {
+    "api/ws-report.ts": {
+      "runtime": "nodejs18.x"
+    }
+  }
 }
