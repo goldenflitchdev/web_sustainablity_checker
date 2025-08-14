@@ -1,13 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['jsdom'],
+  serverExternalPackages: ['jsdom'],
   webpack: (config, { isServer }) => {
     if (isServer) {
+      // Ensure proper handling of server-side dependencies
       config.externals = config.externals || [];
       config.externals.push({
         'jsdom': 'commonjs jsdom',
-        'canvas': 'commonjs canvas',
       });
     }
     
