@@ -11,7 +11,31 @@ interface SustainabilityReport {
   accessibility: number;
   recommendations: string[];
   timestamp: string;
-  analysisMethod?: 'real' | 'simulated';
+  analysisMethod?: 'pagespeed' | 'basic' | 'simulated';
+  co2Data?: {
+    totalCO2: number;
+    co2PerVisit: number;
+    co2Rating: string;
+    breakdown: {
+      dataCenterCO2: number;
+      networkCO2: number;
+      deviceCO2: number;
+      operationalCO2: number;
+      embodiedCO2: number;
+    };
+    greenHostingImpact: {
+      currentCO2: number;
+      withGreenHosting: number;
+      potentialSavings: number;
+      savingsPercentage: number;
+    };
+    optimizationPotential: {
+      unusedCssSavings: number;
+      unusedJsSavings: number;
+      imageOptimizationSavings: number;
+      totalPotentialSavings: number;
+    };
+  };
   analysisData: {
     url: string;
     loadTime: number;
@@ -27,6 +51,32 @@ interface SustainabilityReport {
     greenHosting: boolean;
     compressionEnabled: boolean;
     cdnEnabled: boolean;
+    
+    // Enhanced PageSpeed metrics
+    firstContentfulPaint?: number;
+    largestContentfulPaint?: number;
+    firstInputDelay?: number;
+    cumulativeLayoutShift?: number;
+    speedIndex?: number;
+    totalBlockingTime?: number;
+    
+    // Resource breakdown
+    totalResourceSize?: number;
+    imageResourceSize?: number;
+    scriptResourceSize?: number;
+    stylesheetResourceSize?: number;
+    fontResourceSize?: number;
+    
+    // Optimization opportunities
+    unusedCssBytes?: number;
+    unusedJsBytes?: number;
+    unoptimizedImageBytes?: number;
+    
+    // Additional metrics
+    bestPracticesScore?: number;
+    serverResponseTime?: number;
+    renderBlockingResources?: number;
+    domSize?: number;
   };
 }
 
@@ -203,14 +253,24 @@ export default function Home() {
                 </p>
                 {report.analysisMethod && (
                   <div className={`mt-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                    report.analysisMethod === 'real' 
-                      ? 'bg-green-100 text-green-800' 
+                    report.analysisMethod === 'pagespeed' 
+                      ? 'bg-blue-100 text-blue-800' 
+                      : report.analysisMethod === 'basic'
+                      ? 'bg-green-100 text-green-800'
                       : 'bg-yellow-100 text-yellow-800'
                   }`}>
                     <div className={`w-2 h-2 rounded-full mr-2 ${
-                      report.analysisMethod === 'real' ? 'bg-green-500' : 'bg-yellow-500'
+                      report.analysisMethod === 'pagespeed' 
+                        ? 'bg-blue-500' 
+                        : report.analysisMethod === 'basic'
+                        ? 'bg-green-500' 
+                        : 'bg-yellow-500'
                     }`}></div>
-                    {report.analysisMethod === 'real' ? 'Real-time Analysis' : 'Simulated Analysis'}
+                    {report.analysisMethod === 'pagespeed' 
+                      ? 'PageSpeed Insights + CO2.js' 
+                      : report.analysisMethod === 'basic'
+                      ? 'Basic Analysis'
+                      : 'Simulated Analysis'}
                   </div>
                 )}
               </div>
@@ -341,6 +401,202 @@ export default function Home() {
               </div>
             </div>
 
+            {/* CO2 Emissions Analysis */}
+            {report.co2Data && (
+              <div className="bg-white rounded-xl shadow-lg p-8">
+                <h3 className="text-2xl font-bold text-gray-800 mb-6">Carbon Footprint Analysis</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-6 text-center">
+                    <h4 className="font-semibold text-gray-800 mb-2">CO2 per Visit</h4>
+                    <div className="text-3xl font-bold text-red-600 mb-2">
+                      {report.co2Data.co2PerVisit.toFixed(3)}g
+                    </div>
+                    <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      report.co2Data.co2Rating === 'A+' || report.co2Data.co2Rating === 'A' 
+                        ? 'bg-green-100 text-green-800'
+                        : report.co2Data.co2Rating === 'B' || report.co2Data.co2Rating === 'C'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      Rating: {report.co2Data.co2Rating}
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 text-center">
+                    <h4 className="font-semibold text-gray-800 mb-2">Data Center</h4>
+                    <div className="text-2xl font-bold text-blue-600 mb-2">
+                      {(report.co2Data.breakdown.dataCenterCO2 * 1000).toFixed(1)}mg
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      {((report.co2Data.breakdown.dataCenterCO2 / report.co2Data.co2PerVisit) * 100).toFixed(1)}% of total
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 text-center">
+                    <h4 className="font-semibold text-gray-800 mb-2">Network</h4>
+                    <div className="text-2xl font-bold text-green-600 mb-2">
+                      {(report.co2Data.breakdown.networkCO2 * 1000).toFixed(1)}mg
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      {((report.co2Data.breakdown.networkCO2 / report.co2Data.co2PerVisit) * 100).toFixed(1)}% of total
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-lg p-6 text-center">
+                    <h4 className="font-semibold text-gray-800 mb-2">Device</h4>
+                    <div className="text-2xl font-bold text-purple-600 mb-2">
+                      {(report.co2Data.breakdown.deviceCO2 * 1000).toFixed(1)}mg
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      {((report.co2Data.breakdown.deviceCO2 / report.co2Data.co2PerVisit) * 100).toFixed(1)}% of total
+                    </div>
+                  </div>
+                </div>
+
+                {/* Green Hosting Impact */}
+                {report.co2Data.greenHostingImpact.savingsPercentage > 0 && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+                    <h4 className="font-semibold text-green-800 mb-3">🌱 Green Hosting Impact</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-600">Potential Savings:</span>
+                        <div className="font-mono font-bold text-green-700">
+                          {report.co2Data.greenHostingImpact.potentialSavings.toFixed(3)}g CO2
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Reduction:</span>
+                        <div className="font-mono font-bold text-green-700">
+                          {report.co2Data.greenHostingImpact.savingsPercentage.toFixed(1)}%
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">With Green Hosting:</span>
+                        <div className="font-mono font-bold text-green-700">
+                          {report.co2Data.greenHostingImpact.withGreenHosting.toFixed(3)}g CO2
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Optimization Potential */}
+                {report.co2Data.optimizationPotential.totalPotentialSavings > 0.001 && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                    <h4 className="font-semibold text-blue-800 mb-3">⚡ Optimization Potential</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-600">Unused CSS:</span>
+                        <div className="font-mono font-bold text-blue-700">
+                          {report.co2Data.optimizationPotential.unusedCssSavings.toFixed(3)}g
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Unused JS:</span>
+                        <div className="font-mono font-bold text-blue-700">
+                          {report.co2Data.optimizationPotential.unusedJsSavings.toFixed(3)}g
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Image Optimization:</span>
+                        <div className="font-mono font-bold text-blue-700">
+                          {report.co2Data.optimizationPotential.imageOptimizationSavings.toFixed(3)}g
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Total Potential:</span>
+                        <div className="font-mono font-bold text-blue-700">
+                          {report.co2Data.optimizationPotential.totalPotentialSavings.toFixed(3)}g
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Enhanced Performance Metrics */}
+            {report.analysisData.firstContentfulPaint && (
+              <div className="bg-white rounded-xl shadow-lg p-8">
+                <h3 className="text-2xl font-bold text-gray-800 mb-6">Core Web Vitals</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h4 className="font-semibold text-gray-800 mb-2">First Contentful Paint</h4>
+                    <div className="text-2xl font-bold text-blue-600 mb-1">
+                      {(report.analysisData.firstContentfulPaint! / 1000).toFixed(2)}s
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      {report.analysisData.firstContentfulPaint! < 1800 ? '✅ Good' : 
+                       report.analysisData.firstContentfulPaint! < 3000 ? '⚠️ Needs Improvement' : '❌ Poor'}
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h4 className="font-semibold text-gray-800 mb-2">Largest Contentful Paint</h4>
+                    <div className="text-2xl font-bold text-green-600 mb-1">
+                      {(report.analysisData.largestContentfulPaint! / 1000).toFixed(2)}s
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      {report.analysisData.largestContentfulPaint! < 2500 ? '✅ Good' : 
+                       report.analysisData.largestContentfulPaint! < 4000 ? '⚠️ Needs Improvement' : '❌ Poor'}
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h4 className="font-semibold text-gray-800 mb-2">Cumulative Layout Shift</h4>
+                    <div className="text-2xl font-bold text-purple-600 mb-1">
+                      {report.analysisData.cumulativeLayoutShift!.toFixed(3)}
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      {report.analysisData.cumulativeLayoutShift! < 0.1 ? '✅ Good' : 
+                       report.analysisData.cumulativeLayoutShift! < 0.25 ? '⚠️ Needs Improvement' : '❌ Poor'}
+                    </div>
+                  </div>
+
+                  {report.analysisData.firstInputDelay && (
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-800 mb-2">First Input Delay</h4>
+                      <div className="text-2xl font-bold text-orange-600 mb-1">
+                        {report.analysisData.firstInputDelay.toFixed(0)}ms
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        {report.analysisData.firstInputDelay < 100 ? '✅ Good' : 
+                         report.analysisData.firstInputDelay < 300 ? '⚠️ Needs Improvement' : '❌ Poor'}
+                      </div>
+                    </div>
+                  )}
+
+                  {report.analysisData.totalBlockingTime && (
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-800 mb-2">Total Blocking Time</h4>
+                      <div className="text-2xl font-bold text-red-600 mb-1">
+                        {report.analysisData.totalBlockingTime.toFixed(0)}ms
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        {report.analysisData.totalBlockingTime < 200 ? '✅ Good' : 
+                         report.analysisData.totalBlockingTime < 600 ? '⚠️ Needs Improvement' : '❌ Poor'}
+                      </div>
+                    </div>
+                  )}
+
+                  {report.analysisData.speedIndex && (
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-800 mb-2">Speed Index</h4>
+                      <div className="text-2xl font-bold text-indigo-600 mb-1">
+                        {(report.analysisData.speedIndex / 1000).toFixed(2)}s
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        {report.analysisData.speedIndex < 3400 ? '✅ Good' : 
+                         report.analysisData.speedIndex < 5800 ? '⚠️ Needs Improvement' : '❌ Poor'}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Optimization Features */}
             <div className="bg-white rounded-xl shadow-lg p-8">
               <h3 className="text-2xl font-bold text-gray-800 mb-6">Optimization Features</h3>
@@ -389,6 +645,24 @@ export default function Home() {
                       <p className="text-sm text-yellow-700 mt-1">
                         This analysis uses simulated data because the website couldn't be accessed directly. 
                         For accurate results, ensure the website allows external analysis or try a different URL.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {report.analysisMethod === 'pagespeed' && (
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h4 className="text-sm font-medium text-blue-800">Enhanced Analysis</h4>
+                      <p className="text-sm text-blue-700 mt-1">
+                        This analysis uses Google PageSpeed Insights API combined with CO2.js for accurate carbon footprint calculations and comprehensive sustainability metrics.
                       </p>
                     </div>
                   </div>

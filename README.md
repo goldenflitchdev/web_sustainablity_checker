@@ -1,21 +1,28 @@
 # Web Sustainability Checker
 
-A comprehensive web application that analyzes websites for sustainability metrics and provides actionable recommendations to make them more environmentally friendly and energy-efficient.
+A comprehensive web application that analyzes websites for sustainability metrics using **Google PageSpeed Insights API** and **CO2.js** to provide accurate carbon footprint calculations and actionable recommendations for making websites more environmentally friendly and energy-efficient.
 
 ## 🌱 Features
 
-### Sustainability Analysis
+### Advanced Sustainability Analysis
 - **Overall Sustainability Score**: Comprehensive rating based on multiple factors
 - **Energy Efficiency**: Evaluates page load times and resource optimization
-- **Carbon Footprint**: Calculates environmental impact in CO2 emissions
-- **Resource Optimization**: Analyzes script, CSS, and media file usage
+- **Carbon Footprint**: Accurate CO2 emissions calculated using CO2.js with Sustainable Web Design model
+- **Resource Optimization**: Analyzes script, CSS, and media file usage with unused code detection
 - **Accessibility**: Checks for inclusive design practices
 
-### Technical Metrics
-- **Performance Analysis**: Load times, page sizes, and optimization features
-- **Resource Counting**: Images, scripts, CSS files, fonts, and videos
-- **Quality Scores**: SEO and performance ratings
-- **Optimization Features**: Green hosting, compression, and CDN detection
+### CO2.js Integration
+- **Accurate CO2 Calculations**: Uses the latest Sustainable Web Design v4 model
+- **Detailed Breakdown**: Data center, network, and device emissions
+- **Green Hosting Impact**: Calculate savings from renewable energy hosting  
+- **Optimization Potential**: Quantify CO2 savings from removing unused resources
+- **A+ to F Rating**: Industry-standard carbon footprint ratings
+
+### PageSpeed Insights Integration
+- **Core Web Vitals**: LCP, FID, CLS, and other performance metrics
+- **Resource Analysis**: Detailed breakdown of images, scripts, stylesheets, and fonts
+- **Performance Scores**: Official Google performance, accessibility, best practices, and SEO scores
+- **Optimization Opportunities**: Unused CSS/JS detection and image optimization suggestions
 
 ### Smart Recommendations
 - Personalized suggestions based on analysis results
@@ -42,9 +49,12 @@ cd web_sustainablity_checker
 npm install
 ```
 
-3. Create a `.env.local` file in the root directory (optional, for advanced features):
+3. Create a `.env.local` file in the root directory (optional, for enhanced analysis):
 ```env
-OPENAI_API_KEY=your_openai_api_key_here
+# Google PageSpeed Insights API Key (optional but recommended)
+# Get your API key from: https://developers.google.com/speed/docs/insights/v5/get-started
+# Without this, the app will use fallback simulated data
+GOOGLE_PAGESPEED_API_KEY=your_pagespeed_api_key_here
 ```
 
 4. Run the development server:
@@ -57,18 +67,43 @@ npm run dev
 ## 📊 How It Works
 
 ### 1. Website Analysis
-The application fetches and analyzes websites using:
+The application analyzes websites using multiple methods:
+
+**Primary Method: PageSpeed Insights + CO2.js**
+- **Google PageSpeed Insights API**: Official performance metrics and Core Web Vitals
+- **CO2.js**: Accurate carbon footprint calculations using Sustainable Web Design model
+- **Resource Analysis**: Detailed breakdown of all website resources
+- **Optimization Detection**: Unused CSS/JS and unoptimized images
+
+**Fallback Method: Basic Analysis**
 - **JSDOM**: HTML parsing and analysis
-- **Performance Metrics**: Load times and resource sizes
+- **Performance Metrics**: Load times and resource sizes  
 - **Resource Counting**: Scripts, images, CSS, and media files
 - **Header Analysis**: Compression, CDN, and hosting detection
 
-### 2. Sustainability Scoring
-Scores are calculated based on:
-- **Energy Efficiency (25%)**: Load times, page sizes, media optimization
-- **Carbon Footprint (25%)**: Environmental impact, green hosting
-- **Resource Optimization (25%)**: File consolidation, HTTP requests
-- **Accessibility (25%)**: Semantic HTML, alt text, ARIA labels
+### 2. Advanced Sustainability Scoring
+Scores are calculated using sophisticated algorithms based on:
+
+**Energy Efficiency (25%)**
+- Core Web Vitals (LCP, FID, CLS, TBT)
+- Total resource size and transfer efficiency
+- Performance score from PageSpeed Insights
+
+**Carbon Footprint (35%)** - *Higher weight due to environmental importance*
+- CO2.js calculations using Sustainable Web Design v4 model
+- Data center, network, and device emissions breakdown
+- Green hosting impact assessment
+- A+ to F carbon rating
+
+**Resource Optimization (25%)**
+- Unused CSS and JavaScript detection
+- Image optimization opportunities
+- Render-blocking resources analysis
+- DOM size and complexity
+
+**Performance & Accessibility (15%)**
+- Google PageSpeed performance score
+- Accessibility score from automated testing
 
 ### 3. Smart Recommendations
 The system generates personalized recommendations based on:
@@ -81,8 +116,9 @@ The system generates personalized recommendations based on:
 
 - **Frontend**: Next.js 15, React 19, TypeScript
 - **Styling**: Tailwind CSS 4
-- **HTML Analysis**: JSDOM
-- **Performance**: Built-in performance monitoring
+- **Carbon Calculations**: CO2.js (Sustainable Web Design v4)
+- **Performance Analysis**: Google PageSpeed Insights API
+- **HTML Analysis**: JSDOM (fallback method)
 - **Deployment**: Vercel-ready
 
 ## 📈 Usage Examples
