@@ -109,27 +109,30 @@ export async function POST(request: NextRequest) {
 }
 
 async function generateSimulatedAnalysis(url: string): Promise<WebsiteAnalysis> {
-  // Generate realistic simulated data based on common website patterns
-  const loadTime = Math.random() * 2000 + 500; // 500ms - 2.5s
-  const pageSize = Math.random() * 1500 + 300; // 300KB - 1.8MB
-  const imageCount = Math.floor(Math.random() * 15) + 3; // 3-17 images
-  const scriptCount = Math.floor(Math.random() * 12) + 2; // 2-13 scripts
-  const cssCount = Math.floor(Math.random() * 6) + 1; // 1-6 CSS files
-  const fontCount = Math.floor(Math.random() * 4) + 1; // 1-4 fonts
-  const videoCount = Math.floor(Math.random() * 2); // 0-1 videos
+  // Generate consistent simulated data based on URL hash for deterministic results
+  const seed = generateSeedFromUrl(url);
   
-  // Generate realistic scores
-  const accessibilityScore = Math.max(60, Math.min(95, 80 + (Math.random() - 0.5) * 30));
-  const seoScore = Math.max(65, Math.min(95, 75 + (Math.random() - 0.5) * 20));
-  const performanceScore = Math.max(60, Math.min(95, 75 + (Math.random() - 0.5) * 30));
+  // Generate realistic simulated data based on common website patterns (deterministic)
+  const loadTime = seededRandom(seed, 0) * 2000 + 500; // 500ms - 2.5s
+  const pageSize = seededRandom(seed, 1) * 1500 + 300; // 300KB - 1.8MB
+  const imageCount = Math.floor(seededRandom(seed, 2) * 15) + 3; // 3-17 images
+  const scriptCount = Math.floor(seededRandom(seed, 3) * 12) + 2; // 2-13 scripts
+  const cssCount = Math.floor(seededRandom(seed, 4) * 6) + 1; // 1-6 CSS files
+  const fontCount = Math.floor(seededRandom(seed, 5) * 4) + 1; // 1-4 fonts
+  const videoCount = Math.floor(seededRandom(seed, 6) * 2); // 0-1 videos
+  
+  // Generate realistic scores (deterministic)
+  const accessibilityScore = Math.max(60, Math.min(95, 80 + (seededRandom(seed, 7) - 0.5) * 30));
+  const seoScore = Math.max(65, Math.min(95, 75 + (seededRandom(seed, 8) - 0.5) * 20));
+  const performanceScore = Math.max(60, Math.min(95, 75 + (seededRandom(seed, 9) - 0.5) * 30));
   
   // Calculate carbon footprint
   const carbonFootprint = Math.round((pageSize / 1000) * 0.5 * 100) / 100;
   
-  // Check for optimization features (simulated)
-  const greenHosting = Math.random() > 0.7; // 30% chance
-  const compressionEnabled = Math.random() > 0.4; // 60% chance
-  const cdnEnabled = Math.random() > 0.5; // 50% chance
+  // Check for optimization features (deterministic based on URL)
+  const greenHosting = seededRandom(seed, 10) > 0.7; // 30% chance, but consistent
+  const compressionEnabled = seededRandom(seed, 11) > 0.4; // 60% chance, but consistent
+  const cdnEnabled = seededRandom(seed, 12) > 0.5; // 50% chance, but consistent
 
   return {
     url,
@@ -459,4 +462,28 @@ function checkGreenHosting(url: string): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * Generate a consistent seed from URL for deterministic "random" values
+ */
+function generateSeedFromUrl(url: string): number {
+  let hash = 0;
+  const normalizedUrl = url.toLowerCase().replace(/^https?:\/\/(www\.)?/, '');
+  
+  for (let i = 0; i < normalizedUrl.length; i++) {
+    const char = normalizedUrl.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  return Math.abs(hash);
+}
+
+/**
+ * Generate seeded random number (0-1) based on URL and index
+ */
+function seededRandom(seed: number, index: number): number {
+  const x = Math.sin(seed + index * 1000) * 10000;
+  return x - Math.floor(x);
 }

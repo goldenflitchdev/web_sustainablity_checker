@@ -193,14 +193,22 @@ const overallScore = Math.round(
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
-1. Push to GitHub
-2. Connect repository to Vercel
-3. Deploy automatically
+### Quick Deploy to Vercel (Recommended)
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/goldenflitchdev/web_sustainablity_checker)
+
+**Or manually:**
+1. Fork/clone this repository
+2. Push to your GitHub
+3. Connect to Vercel
+4. Add environment variable: `GOOGLE_PAGESPEED_API_KEY`
+5. Deploy automatically
+
+**📋 See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions**
 
 ### Other Platforms
-- **Netlify**: Compatible with Next.js
-- **Railway**: Easy deployment with environment variables
+- **Netlify**: Compatible with Next.js (add environment variables)
+- **Railway**: Easy deployment with environment variables  
 - **Docker**: Containerized deployment
 
 ## 🤝 Contributing

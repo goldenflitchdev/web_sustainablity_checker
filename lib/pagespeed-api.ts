@@ -306,33 +306,36 @@ export class PageSpeedAPI {
   async analyzeUrlFallback(url: string): Promise<PageSpeedData> {
     console.log('Using fallback PageSpeed analysis for:', url);
     
-    // Generate realistic simulated data based on common website patterns
-    const performanceScore = Math.floor(Math.random() * 40) + 50; // 50-90
-    const accessibilityScore = Math.floor(Math.random() * 30) + 65; // 65-95
-    const bestPracticesScore = Math.floor(Math.random() * 35) + 60; // 60-95
-    const seoScore = Math.floor(Math.random() * 25) + 70; // 70-95
+    // Generate consistent simulated data based on URL hash
+    const seed = this.generateSeedFromUrl(url);
+    
+    // Generate realistic simulated data based on common website patterns (deterministic)
+    const performanceScore = Math.floor(this.seededRandom(seed, 0) * 40) + 50; // 50-90
+    const accessibilityScore = Math.floor(this.seededRandom(seed, 1) * 30) + 65; // 65-95
+    const bestPracticesScore = Math.floor(this.seededRandom(seed, 2) * 35) + 60; // 60-95
+    const seoScore = Math.floor(this.seededRandom(seed, 3) * 25) + 70; // 70-95
 
     // Performance metrics (in milliseconds)
-    const firstContentfulPaint = Math.random() * 2000 + 800; // 0.8-2.8s
-    const largestContentfulPaint = Math.random() * 3000 + 1500; // 1.5-4.5s
-    const firstInputDelay = Math.random() * 100 + 50; // 50-150ms
-    const cumulativeLayoutShift = Math.random() * 0.15; // 0-0.15
-    const speedIndex = Math.random() * 2000 + 1000; // 1-3s
-    const totalBlockingTime = Math.random() * 300 + 100; // 100-400ms
+    const firstContentfulPaint = this.seededRandom(seed, 4) * 2000 + 800; // 0.8-2.8s
+    const largestContentfulPaint = this.seededRandom(seed, 5) * 3000 + 1500; // 1.5-4.5s
+    const firstInputDelay = this.seededRandom(seed, 6) * 100 + 50; // 50-150ms
+    const cumulativeLayoutShift = this.seededRandom(seed, 7) * 0.15; // 0-0.15
+    const speedIndex = this.seededRandom(seed, 8) * 2000 + 1000; // 1-3s
+    const totalBlockingTime = this.seededRandom(seed, 9) * 300 + 100; // 100-400ms
 
     // Resource sizes (in bytes)
-    const totalResourceSize = Math.random() * 2000000 + 500000; // 500KB-2.5MB
-    const imageResourceSize = totalResourceSize * (0.3 + Math.random() * 0.4); // 30-70% of total
-    const scriptResourceSize = totalResourceSize * (0.1 + Math.random() * 0.3); // 10-40% of total
-    const stylesheetResourceSize = totalResourceSize * (0.05 + Math.random() * 0.1); // 5-15% of total
-    const fontResourceSize = totalResourceSize * (0.02 + Math.random() * 0.05); // 2-7% of total
+    const totalResourceSize = this.seededRandom(seed, 10) * 2000000 + 500000; // 500KB-2.5MB
+    const imageResourceSize = totalResourceSize * (0.3 + this.seededRandom(seed, 11) * 0.4); // 30-70% of total
+    const scriptResourceSize = totalResourceSize * (0.1 + this.seededRandom(seed, 12) * 0.3); // 10-40% of total
+    const stylesheetResourceSize = totalResourceSize * (0.05 + this.seededRandom(seed, 13) * 0.1); // 5-15% of total
+    const fontResourceSize = totalResourceSize * (0.02 + this.seededRandom(seed, 14) * 0.05); // 2-7% of total
 
     const resourceCounts = {
-      images: Math.floor(Math.random() * 20) + 5, // 5-25
-      scripts: Math.floor(Math.random() * 15) + 3, // 3-18
-      stylesheets: Math.floor(Math.random() * 8) + 2, // 2-10
-      fonts: Math.floor(Math.random() * 5) + 1, // 1-6
-      videos: Math.floor(Math.random() * 3), // 0-3
+      images: Math.floor(this.seededRandom(seed, 15) * 20) + 5, // 5-25
+      scripts: Math.floor(this.seededRandom(seed, 16) * 15) + 3, // 3-18
+      stylesheets: Math.floor(this.seededRandom(seed, 17) * 8) + 2, // 2-10
+      fonts: Math.floor(this.seededRandom(seed, 18) * 5) + 1, // 1-6
+      videos: Math.floor(this.seededRandom(seed, 19) * 3), // 0-3
       total: 0
     };
     resourceCounts.total = resourceCounts.images + resourceCounts.scripts + resourceCounts.stylesheets + resourceCounts.fonts + resourceCounts.videos;
@@ -359,15 +362,39 @@ export class PageSpeedAPI {
       
       resourceCounts,
       
-      unusedCssBytes: Math.round(stylesheetResourceSize * (Math.random() * 0.3)), // 0-30% unused
-      unusedJsBytes: Math.round(scriptResourceSize * (Math.random() * 0.25)), // 0-25% unused
-      unoptimizedImageBytes: Math.round(imageResourceSize * (Math.random() * 0.4)), // 0-40% could be optimized
+      unusedCssBytes: Math.round(stylesheetResourceSize * (this.seededRandom(seed, 20) * 0.3)), // 0-30% unused
+      unusedJsBytes: Math.round(scriptResourceSize * (this.seededRandom(seed, 21) * 0.25)), // 0-25% unused
+      unoptimizedImageBytes: Math.round(imageResourceSize * (this.seededRandom(seed, 22) * 0.4)), // 0-40% could be optimized
       
-      serverResponseTime: Math.round(Math.random() * 500 + 100), // 100-600ms
-      renderBlockingResources: Math.floor(Math.random() * 8) + 2, // 2-10
+      serverResponseTime: Math.round(this.seededRandom(seed, 23) * 500 + 100), // 100-600ms
+      renderBlockingResources: Math.floor(this.seededRandom(seed, 24) * 8) + 2, // 2-10
       
-      domSize: Math.floor(Math.random() * 1000) + 500, // 500-1500 elements
-      criticalRequestChains: Math.floor(Math.random() * 5) + 2, // 2-7
+      domSize: Math.floor(this.seededRandom(seed, 25) * 1000) + 500, // 500-1500 elements
+      criticalRequestChains: Math.floor(this.seededRandom(seed, 26) * 5) + 2, // 2-7
     };
+  }
+
+  /**
+   * Generate a consistent seed from URL for deterministic "random" values
+   */
+  private generateSeedFromUrl(url: string): number {
+    let hash = 0;
+    const normalizedUrl = url.toLowerCase().replace(/^https?:\/\/(www\.)?/, '');
+    
+    for (let i = 0; i < normalizedUrl.length; i++) {
+      const char = normalizedUrl.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    
+    return Math.abs(hash);
+  }
+
+  /**
+   * Generate seeded random number (0-1) based on URL and index
+   */
+  private seededRandom(seed: number, index: number): number {
+    const x = Math.sin(seed + index * 1000) * 10000;
+    return x - Math.floor(x);
   }
 }
