@@ -1,26 +1,80 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0a0a0a;
+  --golden-black: #0a0a0a;
+  --golden-white: #ffffff;
+  --golden-gray: rgba(10, 10, 10, 0.6);
+  --golden-light-gray: rgba(10, 10, 10, 0.3);
+  --golden-accent: #f59e0b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: 'Inter', 'Inter Placeholder', sans-serif;
+  --font-mono: 'Inter', 'Inter Placeholder', sans-serif;
+  
+  /* Golden Flitch Design Tokens */
+  --color-golden-black: var(--golden-black);
+  --color-golden-white: var(--golden-white);
+  --color-golden-gray: var(--golden-gray);
+  --color-golden-light-gray: var(--golden-light-gray);
+  --color-golden-accent: var(--golden-accent);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #ffffff;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', 'Inter Placeholder', sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.5;
+}
+
+/* Golden Flitch inspired animations and interactions */
+.golden-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.golden-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+.golden-button {
+  background: var(--golden-black);
+  color: var(--golden-white);
+  border-radius: 50px;
+  padding: 16px 32px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.golden-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px -5px rgba(10, 10, 10, 0.3);
+}
+
+.golden-card {
+  background: var(--golden-white);
+  border: 1px solid rgba(10, 10, 10, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.golden-card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
 }
