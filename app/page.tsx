@@ -137,29 +137,31 @@ export default function Home() {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 80) return 'text-green-700';
+    if (score >= 60) return 'text-amber-700';
+    return 'text-red-700';
   };
 
   const getScoreBgColor = (score: number) => {
-    if (score >= 80) return 'bg-green-100';
-    if (score >= 60) return 'bg-yellow-100';
-    return 'bg-red-100';
+    if (score >= 80) return 'bg-green-50';
+    if (score >= 60) return 'bg-amber-50';
+    return 'bg-red-50';
   };
 
   const getStatusIcon = (enabled: boolean) => {
     return enabled ? (
-      <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+      <div className="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center">
+        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
         </svg>
+        <span className="sr-only">Enabled</span>
       </div>
     ) : (
-      <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+      <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center">
+        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
           <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
         </svg>
+        <span className="sr-only">Disabled</span>
       </div>
     );
   };
@@ -177,11 +179,11 @@ export default function Home() {
               height={48}
               className="mr-3"
             />
-            <h1 className="text-4xl font-bold text-gray-800">
+            <h1 className="text-4xl font-bold text-gray-900">
               Web Sustainability Checker
             </h1>
           </div>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-700 max-w-2xl mx-auto">
             Analyze your website's environmental impact and get actionable recommendations 
             to make it more sustainable and energy-efficient.
           </p>
@@ -196,15 +198,15 @@ export default function Home() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="Enter website URL (e.g., example.com or https://example.com)"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-none transition-colors"
                 required
               />
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-gray-600 mt-2">
                 💡 You can enter just the domain (e.g., "example.com") - we'll add https:// automatically
               </p>
               {url && (
                 <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
-                  <p className="text-xs text-blue-700">
+                  <p className="text-xs text-blue-800">
                     <span className="font-medium">Will analyze:</span> {
                       url.startsWith('http://') || url.startsWith('https://') 
                         ? url 
@@ -217,7 +219,8 @@ export default function Home() {
             <button
               type="submit"
               disabled={isLoading}
-              className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              aria-describedby={isLoading ? "loading-status" : undefined}
             >
               {isLoading ? 'Analyzing...' : 'Check Sustainability'}
             </button>
@@ -226,26 +229,26 @@ export default function Home() {
 
         {/* Error Display */}
         {error && (
-          <div className="max-w-2xl mx-auto mb-8 p-4 bg-red-100 border border-red-300 rounded-lg">
-            <p className="text-red-700">{error}</p>
+          <div className="max-w-2xl mx-auto mb-8 p-4 bg-red-100 border border-red-300 rounded-lg" role="alert" aria-live="assertive">
+            <p className="text-red-800 font-medium">{error}</p>
           </div>
         )}
 
         {/* Loading State */}
         {isLoading && (
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
-            <p className="text-gray-600">Analyzing website sustainability...</p>
+          <div className="max-w-2xl mx-auto text-center" role="status" aria-live="polite">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4" aria-hidden="true"></div>
+            <p id="loading-status" className="text-gray-700">Analyzing website sustainability...</p>
           </div>
         )}
 
         {/* Sustainability Report */}
         {report && (
-          <div className="max-w-6xl mx-auto space-y-8">
+          <main className="max-w-6xl mx-auto space-y-8" role="main" aria-labelledby="report-title">
             {/* Overall Score Card */}
-            <div className="bg-white rounded-xl shadow-lg p-8">
+            <section className="bg-white rounded-xl shadow-lg p-8" aria-labelledby="overall-score-title">
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                <h2 id="report-title" className="text-3xl font-bold text-gray-800 mb-2">
                   Sustainability Report
                 </h2>
                 <p className="text-gray-600">
@@ -281,7 +284,7 @@ export default function Home() {
                     {report.overallScore}
                   </span>
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-800 mb-2">Overall Sustainability Score</h3>
+                <h3 id="overall-score-title" className="text-2xl font-semibold text-gray-800 mb-2">Overall Sustainability Score</h3>
                 <p className="text-gray-600 text-lg">
                   {report.overallScore >= 80 ? 'Excellent' : 
                    report.overallScore >= 60 ? 'Good' : 'Needs Improvement'}
@@ -334,11 +337,11 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
 
             {/* Technical Analysis */}
-            <div className="bg-white rounded-xl shadow-lg p-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-6">Technical Analysis</h3>
+            <section className="bg-white rounded-xl shadow-lg p-8" aria-labelledby="technical-analysis-title">
+              <h3 id="technical-analysis-title" className="text-2xl font-bold text-gray-800 mb-6">Technical Analysis</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="bg-gray-50 rounded-lg p-4">
@@ -399,12 +402,12 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
 
             {/* CO2 Emissions Analysis */}
             {report.co2Data && (
-              <div className="bg-white rounded-xl shadow-lg p-8">
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">Carbon Footprint Analysis</h3>
+              <section className="bg-white rounded-xl shadow-lg p-8" aria-labelledby="co2-analysis-title">
+                <h3 id="co2-analysis-title" className="text-2xl font-bold text-gray-800 mb-6">Carbon Footprint Analysis</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-6 text-center">
@@ -428,27 +431,27 @@ export default function Home() {
                     <div className="text-2xl font-bold text-blue-600 mb-2">
                       {(report.co2Data.breakdown.dataCenterCO2 * 1000).toFixed(1)}mg
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-gray-700">
                       {((report.co2Data.breakdown.dataCenterCO2 / report.co2Data.co2PerVisit) * 100).toFixed(1)}% of total
                     </div>
                   </div>
 
                   <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 text-center">
                     <h4 className="font-semibold text-gray-800 mb-2">Network</h4>
-                    <div className="text-2xl font-bold text-green-600 mb-2">
+                    <div className="text-2xl font-bold text-green-700 mb-2">
                       {(report.co2Data.breakdown.networkCO2 * 1000).toFixed(1)}mg
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-gray-700">
                       {((report.co2Data.breakdown.networkCO2 / report.co2Data.co2PerVisit) * 100).toFixed(1)}% of total
                     </div>
                   </div>
 
                   <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-lg p-6 text-center">
                     <h4 className="font-semibold text-gray-800 mb-2">Device</h4>
-                    <div className="text-2xl font-bold text-purple-600 mb-2">
+                    <div className="text-2xl font-bold text-purple-700 mb-2">
                       {(report.co2Data.breakdown.deviceCO2 * 1000).toFixed(1)}mg
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-gray-700">
                       {((report.co2Data.breakdown.deviceCO2 / report.co2Data.co2PerVisit) * 100).toFixed(1)}% of total
                     </div>
                   </div>
@@ -460,20 +463,20 @@ export default function Home() {
                     <h4 className="font-semibold text-green-800 mb-3">🌱 Green Hosting Impact</h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div>
-                        <span className="text-gray-600">Potential Savings:</span>
-                        <div className="font-mono font-bold text-green-700">
+                        <span className="text-gray-700">Potential Savings:</span>
+                        <div className="font-mono font-bold text-green-800">
                           {report.co2Data.greenHostingImpact.potentialSavings.toFixed(3)}g CO2
                         </div>
                       </div>
                       <div>
-                        <span className="text-gray-600">Reduction:</span>
-                        <div className="font-mono font-bold text-green-700">
+                        <span className="text-gray-700">Reduction:</span>
+                        <div className="font-mono font-bold text-green-800">
                           {report.co2Data.greenHostingImpact.savingsPercentage.toFixed(1)}%
                         </div>
                       </div>
                       <div>
-                        <span className="text-gray-600">With Green Hosting:</span>
-                        <div className="font-mono font-bold text-green-700">
+                        <span className="text-gray-700">With Green Hosting:</span>
+                        <div className="font-mono font-bold text-green-800">
                           {report.co2Data.greenHostingImpact.withGreenHosting.toFixed(3)}g CO2
                         </div>
                       </div>
@@ -487,39 +490,39 @@ export default function Home() {
                     <h4 className="font-semibold text-blue-800 mb-3">⚡ Optimization Potential</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <span className="text-gray-600">Unused CSS:</span>
-                        <div className="font-mono font-bold text-blue-700">
+                        <span className="text-gray-700">Unused CSS:</span>
+                        <div className="font-mono font-bold text-blue-800">
                           {report.co2Data.optimizationPotential.unusedCssSavings.toFixed(3)}g
                         </div>
                       </div>
                       <div>
-                        <span className="text-gray-600">Unused JS:</span>
-                        <div className="font-mono font-bold text-blue-700">
+                        <span className="text-gray-700">Unused JS:</span>
+                        <div className="font-mono font-bold text-blue-800">
                           {report.co2Data.optimizationPotential.unusedJsSavings.toFixed(3)}g
                         </div>
                       </div>
                       <div>
-                        <span className="text-gray-600">Image Optimization:</span>
-                        <div className="font-mono font-bold text-blue-700">
+                        <span className="text-gray-700">Image Optimization:</span>
+                        <div className="font-mono font-bold text-blue-800">
                           {report.co2Data.optimizationPotential.imageOptimizationSavings.toFixed(3)}g
                         </div>
                       </div>
                       <div>
-                        <span className="text-gray-600">Total Potential:</span>
-                        <div className="font-mono font-bold text-blue-700">
+                        <span className="text-gray-700">Total Potential:</span>
+                        <div className="font-mono font-bold text-blue-800">
                           {report.co2Data.optimizationPotential.totalPotentialSavings.toFixed(3)}g
                         </div>
                       </div>
                     </div>
                   </div>
                 )}
-              </div>
+              </section>
             )}
 
             {/* Enhanced Performance Metrics */}
             {report.analysisData.firstContentfulPaint && (
-              <div className="bg-white rounded-xl shadow-lg p-8">
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">Core Web Vitals</h3>
+              <section className="bg-white rounded-xl shadow-lg p-8" aria-labelledby="core-web-vitals-title">
+                <h3 id="core-web-vitals-title" className="text-2xl font-bold text-gray-800 mb-6">Core Web Vitals</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div className="bg-gray-50 rounded-lg p-4">
@@ -527,7 +530,7 @@ export default function Home() {
                     <div className="text-2xl font-bold text-blue-600 mb-1">
                       {(report.analysisData.firstContentfulPaint! / 1000).toFixed(2)}s
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-gray-700 font-medium">
                       {report.analysisData.firstContentfulPaint! < 1800 ? '✅ Good' : 
                        report.analysisData.firstContentfulPaint! < 3000 ? '⚠️ Needs Improvement' : '❌ Poor'}
                     </div>
@@ -535,10 +538,10 @@ export default function Home() {
 
                   <div className="bg-gray-50 rounded-lg p-4">
                     <h4 className="font-semibold text-gray-800 mb-2">Largest Contentful Paint</h4>
-                    <div className="text-2xl font-bold text-green-600 mb-1">
+                    <div className="text-2xl font-bold text-green-700 mb-1">
                       {(report.analysisData.largestContentfulPaint! / 1000).toFixed(2)}s
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-gray-700 font-medium">
                       {report.analysisData.largestContentfulPaint! < 2500 ? '✅ Good' : 
                        report.analysisData.largestContentfulPaint! < 4000 ? '⚠️ Needs Improvement' : '❌ Poor'}
                     </div>
@@ -546,10 +549,10 @@ export default function Home() {
 
                   <div className="bg-gray-50 rounded-lg p-4">
                     <h4 className="font-semibold text-gray-800 mb-2">Cumulative Layout Shift</h4>
-                    <div className="text-2xl font-bold text-purple-600 mb-1">
+                    <div className="text-2xl font-bold text-purple-700 mb-1">
                       {report.analysisData.cumulativeLayoutShift!.toFixed(3)}
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-gray-700 font-medium">
                       {report.analysisData.cumulativeLayoutShift! < 0.1 ? '✅ Good' : 
                        report.analysisData.cumulativeLayoutShift! < 0.25 ? '⚠️ Needs Improvement' : '❌ Poor'}
                     </div>
@@ -558,10 +561,10 @@ export default function Home() {
                   {report.analysisData.firstInputDelay && (
                     <div className="bg-gray-50 rounded-lg p-4">
                       <h4 className="font-semibold text-gray-800 mb-2">First Input Delay</h4>
-                      <div className="text-2xl font-bold text-orange-600 mb-1">
+                      <div className="text-2xl font-bold text-orange-700 mb-1">
                         {report.analysisData.firstInputDelay.toFixed(0)}ms
                       </div>
-                      <div className="text-xs text-gray-600">
+                      <div className="text-xs text-gray-700 font-medium">
                         {report.analysisData.firstInputDelay < 100 ? '✅ Good' : 
                          report.analysisData.firstInputDelay < 300 ? '⚠️ Needs Improvement' : '❌ Poor'}
                       </div>
@@ -571,10 +574,10 @@ export default function Home() {
                   {report.analysisData.totalBlockingTime && (
                     <div className="bg-gray-50 rounded-lg p-4">
                       <h4 className="font-semibold text-gray-800 mb-2">Total Blocking Time</h4>
-                      <div className="text-2xl font-bold text-red-600 mb-1">
+                      <div className="text-2xl font-bold text-red-700 mb-1">
                         {report.analysisData.totalBlockingTime.toFixed(0)}ms
                       </div>
-                      <div className="text-xs text-gray-600">
+                      <div className="text-xs text-gray-700 font-medium">
                         {report.analysisData.totalBlockingTime < 200 ? '✅ Good' : 
                          report.analysisData.totalBlockingTime < 600 ? '⚠️ Needs Improvement' : '❌ Poor'}
                       </div>
@@ -584,22 +587,22 @@ export default function Home() {
                   {report.analysisData.speedIndex && (
                     <div className="bg-gray-50 rounded-lg p-4">
                       <h4 className="font-semibold text-gray-800 mb-2">Speed Index</h4>
-                      <div className="text-2xl font-bold text-indigo-600 mb-1">
+                      <div className="text-2xl font-bold text-indigo-700 mb-1">
                         {(report.analysisData.speedIndex / 1000).toFixed(2)}s
                       </div>
-                      <div className="text-xs text-gray-600">
+                      <div className="text-xs text-gray-700 font-medium">
                         {report.analysisData.speedIndex < 3400 ? '✅ Good' : 
                          report.analysisData.speedIndex < 5800 ? '⚠️ Needs Improvement' : '❌ Poor'}
                       </div>
                     </div>
                   )}
                 </div>
-              </div>
+              </section>
             )}
 
             {/* Optimization Features */}
-            <div className="bg-white rounded-xl shadow-lg p-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-6">Optimization Features</h3>
+            <section className="bg-white rounded-xl shadow-lg p-8" aria-labelledby="optimization-features-title">
+              <h3 id="optimization-features-title" className="text-2xl font-bold text-gray-800 mb-6">Optimization Features</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
@@ -626,11 +629,11 @@ export default function Home() {
                   {getStatusIcon(report.analysisData.cdnEnabled)}
                 </div>
               </div>
-            </div>
+            </section>
 
             {/* Recommendations */}
-            <div className="bg-white rounded-xl shadow-lg p-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-6">Recommendations</h3>
+            <section className="bg-white rounded-xl shadow-lg p-8" aria-labelledby="recommendations-title">
+              <h3 id="recommendations-title" className="text-2xl font-bold text-gray-800 mb-6">Recommendations</h3>
               
               {report.analysisMethod === 'simulated' && (
                 <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -679,12 +682,12 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-            </div>
-          </div>
+            </section>
+          </main>
         )}
 
         {/* Footer */}
-        <footer className="text-center mt-16 text-gray-500">
+        <footer className="text-center mt-16 text-gray-600">
           <p>Built with Next.js • Promoting sustainable web development</p>
         </footer>
       </div>
