@@ -227,7 +227,7 @@ export default function Home() {
 
         {/* Error Display */}
         {error && (
-          <div className="max-w-4xl mx-auto mb-12 p-6 bg-red-50 border-2 border-red-200 rounded-3xl" role="alert" aria-live="assertive">
+          <div className="max-w-4xl mx-auto mb-12 p-6 bg-red-50 rounded-3xl" role="alert" aria-live="assertive">
             <p className="text-red-800 font-semibold text-center">{error}</p>
           </div>
         )}
@@ -244,7 +244,7 @@ export default function Home() {
         {report && (
           <main className="space-y-16" role="main" aria-labelledby="report-title">
             {/* Overall Score Card */}
-            <section className="golden-card golden-hover p-12" aria-labelledby="overall-score-title">
+            <section className="golden-card p-12" aria-labelledby="overall-score-title">
               <div className="text-center mb-12">
                 <h2 id="report-title" className="text-4xl font-semibold text-black mb-4 tracking-tight">
                   Sustainability Report
@@ -338,7 +338,7 @@ export default function Home() {
             </section>
 
             {/* Technical Analysis */}
-            <section className="golden-card golden-hover p-12" aria-labelledby="technical-analysis-title">
+            <section className="golden-card p-12" aria-labelledby="technical-analysis-title">
               <h3 id="technical-analysis-title" className="text-3xl font-semibold text-black mb-12 tracking-tight">Technical Analysis</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -404,7 +404,7 @@ export default function Home() {
 
             {/* CO2 Emissions Analysis */}
             {report.co2Data && (
-              <section className="golden-card golden-hover p-12" aria-labelledby="co2-analysis-title">
+              <section className="golden-card p-12" aria-labelledby="co2-analysis-title">
                 <h3 id="co2-analysis-title" className="text-3xl font-semibold text-black mb-12 tracking-tight">Carbon Footprint Analysis</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
@@ -519,7 +519,7 @@ export default function Home() {
 
             {/* Enhanced Performance Metrics */}
             {report.analysisData.firstContentfulPaint && (
-              <section className="golden-card golden-hover p-12" aria-labelledby="core-web-vitals-title">
+              <section className="golden-card p-12" aria-labelledby="core-web-vitals-title">
                 <h3 id="core-web-vitals-title" className="text-3xl font-semibold text-black mb-12 tracking-tight">Core Web Vitals</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -599,7 +599,7 @@ export default function Home() {
             )}
 
             {/* Optimization Features */}
-            <section className="golden-card golden-hover p-12" aria-labelledby="optimization-features-title">
+            <section className="golden-card p-12" aria-labelledby="optimization-features-title">
               <h3 id="optimization-features-title" className="text-3xl font-semibold text-black mb-12 tracking-tight">Optimization Features</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -630,11 +630,11 @@ export default function Home() {
             </section>
 
             {/* Recommendations */}
-            <section className="golden-card golden-hover p-12" aria-labelledby="recommendations-title">
+            <section className="golden-card p-12" aria-labelledby="recommendations-title">
               <h3 id="recommendations-title" className="text-3xl font-semibold text-black mb-12 tracking-tight">Recommendations</h3>
               
               {report.analysisMethod === 'simulated' && (
-                <div className="mb-8 p-6 bg-amber-50 border-2 border-amber-200 rounded-3xl">
+                <div className="mb-8 p-6 bg-amber-50 rounded-3xl">
                   <div className="flex items-start">
                     <div className="flex-shrink-0">
                       <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center">
