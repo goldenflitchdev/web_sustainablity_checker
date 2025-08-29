@@ -130,18 +130,28 @@ export class PageSpeedAPI {
         locale: 'en'
       });
 
-      // Add multiple category parameters correctly
+      // Add multiple category parameters correctly - prioritize performance for speed
       const categories = ['performance', 'accessibility', 'best-practices', 'seo'];
       categories.forEach(category => params.append('category', category));
 
       console.log('Calling PageSpeed Insights API for:', url);
+      
+      // Create abort controller for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        console.log('PageSpeed API timeout after 45 seconds, aborting...');
+        controller.abort();
+      }, 45000); // 45 second timeout
       
       const response = await fetch(`${this.baseUrl}?${params}`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
         },
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -155,6 +165,12 @@ export class PageSpeedAPI {
       return this.extractPageSpeedData(data);
     } catch (error) {
       console.error('PageSpeed API analysis failed:', error);
+      
+      // Handle timeout errors specifically
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('PageSpeed Insights API timed out after 45 seconds. Using fallback analysis.');
+      }
+      
       throw new Error(`Failed to analyze with PageSpeed Insights: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }

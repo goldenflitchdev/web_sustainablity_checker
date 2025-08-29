@@ -21,14 +21,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid URL format" }, { status: 400 });
     }
     
-    // Try PageSpeed Insights API first, then fallback to basic analysis
-    let pageSpeedData: PageSpeedData | null = null;
-    let websiteData: WebsiteAnalysis | null = null;
-    let analysisMethod: 'pagespeed' | 'basic' | 'simulated' = 'pagespeed';
+    // Create a timeout wrapper for the entire analysis
+    const analysisTimeout = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Analysis timed out')), 55000); // 55 seconds max
+    });
     
-    // Initialize PageSpeed API
-    const pageSpeedAPI = new PageSpeedAPI();
-    const co2Calculator = new CO2Calculator();
+    const analysisPromise = async () => {
+      // Try PageSpeed Insights API first, then fallback to basic analysis
+      let pageSpeedData: PageSpeedData | null = null;
+      let websiteData: WebsiteAnalysis | null = null;
+      let analysisMethod: 'pagespeed' | 'basic' | 'simulated' = 'pagespeed';
+      
+      // Initialize PageSpeed API
+      const pageSpeedAPI = new PageSpeedAPI();
+      const co2Calculator = new CO2Calculator();
     
     try {
       console.log('Attempting PageSpeed Insights analysis for:', url);
@@ -86,22 +92,33 @@ export async function POST(request: NextRequest) {
       
       console.log('Sustainability report generated successfully');
 
-      return NextResponse.json({
+      return {
         choices: [{
           message: {
             content: JSON.stringify(report)
           }
         }]
-      });
+      };
     } catch (reportError) {
       console.error('Failed to generate sustainability report:', reportError);
-      return NextResponse.json({ 
-        error: "Analysis completed but failed to generate report. Please try again." 
-      }, { status: 500 });
+      throw new Error("Analysis completed but failed to generate report. Please try again.");
     }
+    };
+
+    // Race between analysis and timeout
+    const result = await Promise.race([analysisPromise(), analysisTimeout]);
+    return NextResponse.json(result);
 
   } catch (e: any) {
     console.error('API Error:', e);
+    
+    // Handle timeout specifically
+    if (e.message === 'Analysis timed out') {
+      return NextResponse.json({ 
+        error: "Analysis is taking too long. Please try again with a simpler website or try again later." 
+      }, { status: 408 }); // Request Timeout
+    }
+    
     return NextResponse.json({ 
       error: "An unexpected error occurred. Please try again later." 
     }, { status: 500 });
