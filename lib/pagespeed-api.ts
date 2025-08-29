@@ -166,10 +166,17 @@ export class PageSpeedAPI {
     } catch (error) {
       console.error('PageSpeed API analysis failed:', error);
       
-      // Handle timeout/abort errors specifically (check both name and code)
-      if (error instanceof Error && (error.name === 'AbortError' || (error as any).code === 20)) {
+      // Handle timeout/abort errors with comprehensive detection
+      const isAbortError = error instanceof Error && (
+        error.name === 'AbortError' || 
+        (error as any).code === 20 ||
+        error.message.includes('aborted') ||
+        error.message.includes('abort')
+      );
+      
+      if (isAbortError) {
         console.log('PageSpeed API was aborted due to timeout, proceeding to fallback...');
-        throw new Error('PageSpeed Insights API timed out after 25 seconds. Using fallback analysis.');
+        throw new Error('TIMEOUT_FALLBACK'); // Special error code for timeout handling
       }
       
       throw new Error(`Failed to analyze with PageSpeed Insights: ${error instanceof Error ? error.message : 'Unknown error'}`);

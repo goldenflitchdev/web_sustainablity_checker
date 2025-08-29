@@ -41,34 +41,47 @@ export async function POST(request: NextRequest) {
       pageSpeedData = await pageSpeedAPI.analyzeUrl(url);
       console.log('PageSpeed Insights analysis successful');
     } catch (pageSpeedError) {
-      console.warn('PageSpeed Insights failed, trying fallback PageSpeed analysis:', pageSpeedError);
+      // Check if it's a timeout error
+      const errorMessage = pageSpeedError instanceof Error ? pageSpeedError.message : String(pageSpeedError);
       
-      try {
-        pageSpeedData = await pageSpeedAPI.analyzeUrlFallback(url);
-        analysisMethod = 'simulated';
-        console.log('Fallback PageSpeed analysis successful');
-      } catch (fallbackError) {
-        console.warn('PageSpeed fallback failed, trying basic website analysis:', fallbackError);
-        
-        // Try basic website analysis as last resort
+      if (errorMessage === 'TIMEOUT_FALLBACK') {
+        console.log('PageSpeed API timed out, using fast fallback...');
         try {
-          const analyzer = new WebsiteAnalyzer();
-          websiteData = await analyzer.analyzeWebsite(url);
-          analysisMethod = 'basic';
-          console.log('Basic website analysis successful');
-        } catch (basicError) {
-          console.warn('Basic analysis failed, using simulated data:', basicError);
+          pageSpeedData = await pageSpeedAPI.analyzeUrlFallback(url);
+          analysisMethod = 'simulated';
+          console.log('Timeout fallback PageSpeed analysis successful');
+        } catch (fallbackError) {
+          console.warn('Even fallback failed, using simulated data');
+          // Skip to simulated data generation
+        }
+      } else {
+        console.warn('PageSpeed Insights failed, trying fallback PageSpeed analysis:', pageSpeedError);
+        
+        try {
+          pageSpeedData = await pageSpeedAPI.analyzeUrlFallback(url);
+          analysisMethod = 'simulated';
+          console.log('Fallback PageSpeed analysis successful');
+        } catch (fallbackError) {
+          console.warn('PageSpeed fallback failed, trying basic website analysis:', fallbackError);
           
-          // Final fallback - simulated data
+          // Try basic website analysis as last resort
           try {
-            websiteData = await generateSimulatedAnalysis(url);
-            analysisMethod = 'simulated';
-            console.log('Simulated analysis generated successfully');
-          } catch (simulationError) {
-            console.error('All analysis methods failed:', simulationError);
-            return NextResponse.json({ 
-              error: "Unable to analyze website. Please try a different URL or check if the website is accessible." 
-            }, { status: 500 });
+            const analyzer = new WebsiteAnalyzer();
+            websiteData = await analyzer.analyzeWebsite(url);
+            analysisMethod = 'basic';
+            console.log('Basic website analysis successful');
+          } catch (basicError) {
+            console.warn('Basic analysis failed, using simulated data:', basicError);
+            
+            // Final fallback - simulated data
+            try {
+              websiteData = await generateSimulatedAnalysis(url);
+              analysisMethod = 'simulated';
+              console.log('Simulated analysis generated successfully');
+            } catch (simulationError) {
+              console.error('All analysis methods failed:', simulationError);
+              throw new Error("Unable to analyze website. Please try a different URL or check if the website is accessible.");
+            }
           }
         }
       }
