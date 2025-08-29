@@ -170,7 +170,7 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-6 py-16 max-w-7xl">
         {/* Header */}
-        <header className="text-center mb-20">
+        <header className="text-left mb-20">
           <div className="mb-8">
             <h1 className="text-6xl md:text-7xl font-semibold text-black mb-6 tracking-tight leading-none">
               Web Sustainability
@@ -178,7 +178,7 @@ export default function Home() {
               <span className="text-black/60">Checker</span>
             </h1>
           </div>
-          <p className="text-lg text-black/60 max-w-3xl mx-auto leading-relaxed font-medium">
+          <p className="text-lg text-black/60 max-w-3xl leading-relaxed font-medium">
             Analyze your website's environmental impact with precision using Google PageSpeed Insights 
             and CO2.js to get actionable sustainability recommendations.
           </p>
