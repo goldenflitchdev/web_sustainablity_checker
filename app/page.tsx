@@ -174,9 +174,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F1F7E2' }}>
-      <div className="container mx-auto px-6 py-16 max-w-7xl">
+      <div className="container mx-auto px-12 py-16 max-w-7xl">
         {/* Header */}
-        <header className="text-left mb-20 pl-12">
+        <header className="text-left mb-20">
           <div className="mb-8">
             <h1 className="text-6xl md:text-7xl font-semibold text-black mb-6 tracking-tight leading-none">
               Web Sustainability
@@ -191,7 +191,7 @@ export default function Home() {
         </header>
 
         {/* URL Input Form */}
-        <div className="mb-20 pl-12">
+        <div className="mb-20">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="relative">
               <input
@@ -233,14 +233,14 @@ export default function Home() {
 
         {/* Error Display */}
         {error && (
-          <div className="mb-12 ml-12 p-6 bg-red-50 rounded-3xl" role="alert" aria-live="assertive">
+          <div className="mb-12 p-6 bg-red-50 rounded-3xl" role="alert" aria-live="assertive">
             <p className="text-red-800 font-semibold text-left">{error}</p>
           </div>
         )}
 
         {/* Loading State */}
         {isLoading && (
-          <div className="text-left mb-20 pl-12" role="status" aria-live="polite">
+          <div className="text-left mb-20" role="status" aria-live="polite">
             <div className="w-12 h-12 border-4 border-black/10 border-t-black rounded-full animate-spin mb-8" aria-hidden="true"></div>
             <p id="loading-status" className="text-xl font-medium text-black/60">Analyzing website sustainability...</p>
           </div>
@@ -618,7 +618,7 @@ export default function Home() {
         )}
 
         {/* Footer */}
-        <footer className="text-left mt-24 pt-16 border-t border-black/10 pl-12">
+        <footer className="text-left mt-24 pt-16 border-t border-black/10">
           <p className="text-black/40 font-medium text-lg tracking-tight">
             Built with Next.js • Promoting sustainable web development
           </p>
