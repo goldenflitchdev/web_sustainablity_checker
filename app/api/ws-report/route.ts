@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     
     // Create a timeout wrapper for the entire analysis
     const analysisTimeout = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Analysis timed out')), 55000); // 55 seconds max
+      setTimeout(() => reject(new Error('Analysis timed out')), 50000); // 50 seconds max
     });
     
     const analysisPromise = async () => {

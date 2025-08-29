@@ -139,9 +139,9 @@ export class PageSpeedAPI {
       // Create abort controller for timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
-        console.log('PageSpeed API timeout after 45 seconds, aborting...');
+        console.log('PageSpeed API timeout after 25 seconds, aborting...');
         controller.abort();
-      }, 45000); // 45 second timeout
+      }, 25000); // 25 second timeout for better production performance
       
       const response = await fetch(`${this.baseUrl}?${params}`, {
         method: 'GET',
@@ -166,9 +166,10 @@ export class PageSpeedAPI {
     } catch (error) {
       console.error('PageSpeed API analysis failed:', error);
       
-      // Handle timeout errors specifically
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error('PageSpeed Insights API timed out after 45 seconds. Using fallback analysis.');
+      // Handle timeout/abort errors specifically (check both name and code)
+      if (error instanceof Error && (error.name === 'AbortError' || (error as any).code === 20)) {
+        console.log('PageSpeed API was aborted due to timeout, proceeding to fallback...');
+        throw new Error('PageSpeed Insights API timed out after 25 seconds. Using fallback analysis.');
       }
       
       throw new Error(`Failed to analyze with PageSpeed Insights: ${error instanceof Error ? error.message : 'Unknown error'}`);
