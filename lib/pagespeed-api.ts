@@ -127,9 +127,9 @@ export class PageSpeedAPI {
       // Create abort controller for timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
-        console.log('PageSpeed API timeout after 25 seconds, aborting...');
+        console.log('PageSpeed API timeout after 100 seconds, aborting...');
         controller.abort();
-      }, 25000); // 25 second timeout for better production performance
+      }, 100000); // 100 second timeout to prevent any timeout issues
 
       try {
         const params = new URLSearchParams({
