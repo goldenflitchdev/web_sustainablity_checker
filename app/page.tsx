@@ -166,6 +166,12 @@ export default function Home() {
     );
   };
 
+  const getScoreCircleColor = (score: number) => {
+    if (score >= 75) return 'bg-green-600';
+    if (score >= 50) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-6 py-16 max-w-7xl">
@@ -185,7 +191,7 @@ export default function Home() {
         </header>
 
         {/* URL Input Form */}
-        <div className="max-w-4xl mb-20">
+        <div className="mb-20">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="relative">
               <input
@@ -227,14 +233,14 @@ export default function Home() {
 
         {/* Error Display */}
         {error && (
-          <div className="max-w-4xl mb-12 p-6 bg-red-50 rounded-3xl" role="alert" aria-live="assertive">
+          <div className="mb-12 p-6 bg-red-50 rounded-3xl" role="alert" aria-live="assertive">
             <p className="text-red-800 font-semibold text-left">{error}</p>
           </div>
         )}
 
         {/* Loading State */}
         {isLoading && (
-          <div className="max-w-4xl text-left mb-20" role="status" aria-live="polite">
+          <div className="text-left mb-20" role="status" aria-live="polite">
             <div className="w-12 h-12 border-4 border-black/10 border-t-black rounded-full animate-spin mb-8" aria-hidden="true"></div>
             <p id="loading-status" className="text-xl font-medium text-black/60">Analyzing website sustainability...</p>
           </div>
@@ -278,8 +284,8 @@ export default function Home() {
 
               <div className="text-left mb-12">
                 <div className="flex items-center justify-start mb-6">
-                  <div className="flex items-center justify-center w-40 h-40 rounded-full bg-black/5">
-                    <span className="text-6xl font-semibold text-black">
+                  <div className={`flex items-center justify-center w-40 h-40 rounded-full ${getScoreCircleColor(report.overallScore)}`}>
+                    <span className="text-6xl font-semibold text-white">
                       {report.overallScore}
                     </span>
                   </div>
@@ -410,7 +416,7 @@ export default function Home() {
                 <h3 id="co2-analysis-title" className="text-3xl font-semibold text-black mb-12 tracking-tight">Carbon Footprint Analysis</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-                  <div className="bg-black/5 rounded-3xl p-8 text-center golden-transition hover:bg-black/10">
+                  <div className="bg-black/5 rounded-3xl p-8 text-left golden-transition hover:bg-black/10">
                     <h4 className="font-semibold text-black mb-4 text-lg">CO2 per Visit</h4>
                     <div className="text-4xl font-semibold text-black mb-4">
                       {report.co2Data.co2PerVisit.toFixed(3)}g
@@ -426,7 +432,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="bg-black/5 rounded-3xl p-8 text-center golden-transition hover:bg-black/10">
+                  <div className="bg-black/5 rounded-3xl p-8 text-left golden-transition hover:bg-black/10">
                     <h4 className="font-semibold text-black mb-4 text-lg">Data Center</h4>
                     <div className="text-3xl font-semibold text-black mb-4">
                       {(report.co2Data.breakdown.dataCenterCO2 * 1000).toFixed(1)}mg
@@ -436,7 +442,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="bg-black/5 rounded-3xl p-8 text-center golden-transition hover:bg-black/10">
+                  <div className="bg-black/5 rounded-3xl p-8 text-left golden-transition hover:bg-black/10">
                     <h4 className="font-semibold text-black mb-4 text-lg">Network</h4>
                     <div className="text-3xl font-semibold text-black mb-4">
                       {(report.co2Data.breakdown.networkCO2 * 1000).toFixed(1)}mg
@@ -446,7 +452,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="bg-black/5 rounded-3xl p-8 text-center golden-transition hover:bg-black/10">
+                  <div className="bg-black/5 rounded-3xl p-8 text-left golden-transition hover:bg-black/10">
                     <h4 className="font-semibold text-black mb-4 text-lg">Device</h4>
                     <div className="text-3xl font-semibold text-black mb-4">
                       {(report.co2Data.breakdown.deviceCO2 * 1000).toFixed(1)}mg
@@ -462,19 +468,19 @@ export default function Home() {
                   <div className="bg-black rounded-3xl p-8 mb-8">
                     <h4 className="font-semibold text-white mb-6 text-xl">🌱 Green Hosting Impact</h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="text-center">
+                      <div className="text-left">
                         <span className="text-white/60 font-medium block mb-2">Potential Savings</span>
                         <div className="font-semibold text-white text-2xl">
                           {report.co2Data.greenHostingImpact.potentialSavings.toFixed(3)}g CO2
                         </div>
                       </div>
-                      <div className="text-center">
+                      <div className="text-left">
                         <span className="text-white/60 font-medium block mb-2">Reduction</span>
                         <div className="font-semibold text-white text-2xl">
                           {report.co2Data.greenHostingImpact.savingsPercentage.toFixed(1)}%
                         </div>
                       </div>
-                      <div className="text-center">
+                      <div className="text-left">
                         <span className="text-white/60 font-medium block mb-2">With Green Hosting</span>
                         <div className="font-semibold text-white text-2xl">
                           {report.co2Data.greenHostingImpact.withGreenHosting.toFixed(3)}g CO2
@@ -489,25 +495,25 @@ export default function Home() {
                   <div className="bg-black/5 rounded-3xl p-8">
                     <h4 className="font-semibold text-black mb-6 text-xl">⚡ Optimization Potential</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                      <div className="text-center">
+                      <div className="text-left">
                         <span className="text-black/60 font-medium block mb-2">Unused CSS</span>
                         <div className="font-semibold text-black text-xl">
                           {report.co2Data.optimizationPotential.unusedCssSavings.toFixed(3)}g
                         </div>
                       </div>
-                      <div className="text-center">
+                      <div className="text-left">
                         <span className="text-black/60 font-medium block mb-2">Unused JS</span>
                         <div className="font-semibold text-black text-xl">
                           {report.co2Data.optimizationPotential.unusedJsSavings.toFixed(3)}g
                         </div>
                       </div>
-                      <div className="text-center">
+                      <div className="text-left">
                         <span className="text-black/60 font-medium block mb-2">Image Optimization</span>
                         <div className="font-semibold text-black text-xl">
                           {report.co2Data.optimizationPotential.imageOptimizationSavings.toFixed(3)}g
                         </div>
                       </div>
-                      <div className="text-center">
+                      <div className="text-left">
                         <span className="text-black/60 font-medium block mb-2">Total Potential</span>
                         <div className="font-semibold text-black text-xl">
                           {report.co2Data.optimizationPotential.totalPotentialSavings.toFixed(3)}g
@@ -519,86 +525,7 @@ export default function Home() {
               </section>
             )}
 
-            {/* Enhanced Performance Metrics */}
-            {report.analysisData.firstContentfulPaint && (
-              <section className="golden-card p-12" aria-labelledby="core-web-vitals-title">
-                <h3 id="core-web-vitals-title" className="text-3xl font-semibold text-black mb-12 tracking-tight">Core Web Vitals</h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  <div className="bg-black/5 rounded-3xl p-6 golden-transition hover:bg-black/10">
-                    <h4 className="font-semibold text-black mb-4 text-lg">First Contentful Paint</h4>
-                    <div className="text-3xl font-semibold text-black mb-3">
-                      {(report.analysisData.firstContentfulPaint! / 1000).toFixed(2)}s
-                    </div>
-                    <div className="text-sm text-black/60 font-medium">
-                      {report.analysisData.firstContentfulPaint! < 1800 ? '✅ Good' : 
-                       report.analysisData.firstContentfulPaint! < 3000 ? '⚠️ Needs Improvement' : '❌ Poor'}
-                    </div>
-                  </div>
 
-                  <div className="bg-black/5 rounded-3xl p-6 golden-transition hover:bg-black/10">
-                    <h4 className="font-semibold text-black mb-4 text-lg">Largest Contentful Paint</h4>
-                    <div className="text-3xl font-semibold text-black mb-3">
-                      {(report.analysisData.largestContentfulPaint! / 1000).toFixed(2)}s
-                    </div>
-                    <div className="text-sm text-black/60 font-medium">
-                      {report.analysisData.largestContentfulPaint! < 2500 ? '✅ Good' : 
-                       report.analysisData.largestContentfulPaint! < 4000 ? '⚠️ Needs Improvement' : '❌ Poor'}
-                    </div>
-                  </div>
-
-                  <div className="bg-black/5 rounded-3xl p-6 golden-transition hover:bg-black/10">
-                    <h4 className="font-semibold text-black mb-4 text-lg">Cumulative Layout Shift</h4>
-                    <div className="text-3xl font-semibold text-black mb-3">
-                      {report.analysisData.cumulativeLayoutShift!.toFixed(3)}
-                    </div>
-                    <div className="text-sm text-black/60 font-medium">
-                      {report.analysisData.cumulativeLayoutShift! < 0.1 ? '✅ Good' : 
-                       report.analysisData.cumulativeLayoutShift! < 0.25 ? '⚠️ Needs Improvement' : '❌ Poor'}
-                    </div>
-                  </div>
-
-                  {report.analysisData.firstInputDelay && (
-                    <div className="bg-black/5 rounded-3xl p-6 golden-transition hover:bg-black/10">
-                      <h4 className="font-semibold text-black mb-4 text-lg">First Input Delay</h4>
-                      <div className="text-3xl font-semibold text-black mb-3">
-                        {report.analysisData.firstInputDelay.toFixed(0)}ms
-                      </div>
-                      <div className="text-sm text-black/60 font-medium">
-                        {report.analysisData.firstInputDelay < 100 ? '✅ Good' : 
-                         report.analysisData.firstInputDelay < 300 ? '⚠️ Needs Improvement' : '❌ Poor'}
-                      </div>
-                    </div>
-                  )}
-
-                  {report.analysisData.totalBlockingTime && (
-                    <div className="bg-black/5 rounded-3xl p-6 golden-transition hover:bg-black/10">
-                      <h4 className="font-semibold text-black mb-4 text-lg">Total Blocking Time</h4>
-                      <div className="text-3xl font-semibold text-black mb-3">
-                        {report.analysisData.totalBlockingTime.toFixed(0)}ms
-                      </div>
-                      <div className="text-sm text-black/60 font-medium">
-                        {report.analysisData.totalBlockingTime < 200 ? '✅ Good' : 
-                         report.analysisData.totalBlockingTime < 600 ? '⚠️ Needs Improvement' : '❌ Poor'}
-                      </div>
-                    </div>
-                  )}
-
-                  {report.analysisData.speedIndex && (
-                    <div className="bg-black/5 rounded-3xl p-6 golden-transition hover:bg-black/10">
-                      <h4 className="font-semibold text-black mb-4 text-lg">Speed Index</h4>
-                      <div className="text-3xl font-semibold text-black mb-3">
-                        {(report.analysisData.speedIndex / 1000).toFixed(2)}s
-                      </div>
-                      <div className="text-sm text-black/60 font-medium">
-                        {report.analysisData.speedIndex < 3400 ? '✅ Good' : 
-                         report.analysisData.speedIndex < 5800 ? '⚠️ Needs Improvement' : '❌ Poor'}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </section>
-            )}
 
             {/* Optimization Features */}
             <section className="golden-card p-12" aria-labelledby="optimization-features-title">
