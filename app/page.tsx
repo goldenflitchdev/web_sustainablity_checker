@@ -185,7 +185,7 @@ export default function Home() {
         </header>
 
         {/* URL Input Form */}
-        <div className="max-w-4xl mx-auto mb-20">
+        <div className="max-w-4xl mb-20">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="relative">
               <input
@@ -209,7 +209,7 @@ export default function Home() {
               )}
             </div>
             
-            <div className="text-center">
+            <div className="text-left">
               <button
                 type="submit"
                 disabled={isLoading}
@@ -227,15 +227,15 @@ export default function Home() {
 
         {/* Error Display */}
         {error && (
-          <div className="max-w-4xl mx-auto mb-12 p-6 bg-red-50 rounded-3xl" role="alert" aria-live="assertive">
-            <p className="text-red-800 font-semibold text-center">{error}</p>
+          <div className="max-w-4xl mb-12 p-6 bg-red-50 rounded-3xl" role="alert" aria-live="assertive">
+            <p className="text-red-800 font-semibold text-left">{error}</p>
           </div>
         )}
 
         {/* Loading State */}
         {isLoading && (
-          <div className="max-w-4xl mx-auto text-center mb-20" role="status" aria-live="polite">
-            <div className="inline-block w-12 h-12 border-4 border-black/10 border-t-black rounded-full animate-spin mb-8" aria-hidden="true"></div>
+          <div className="max-w-4xl text-left mb-20" role="status" aria-live="polite">
+            <div className="w-12 h-12 border-4 border-black/10 border-t-black rounded-full animate-spin mb-8" aria-hidden="true"></div>
             <p id="loading-status" className="text-xl font-medium text-black/60">Analyzing website sustainability...</p>
           </div>
         )}
@@ -245,7 +245,7 @@ export default function Home() {
           <main className="space-y-16" role="main" aria-labelledby="report-title">
             {/* Overall Score Card */}
             <section className="golden-card p-12" aria-labelledby="overall-score-title">
-              <div className="text-center mb-12">
+              <div className="text-left mb-12">
                 <h2 id="report-title" className="text-4xl font-semibold text-black mb-4 tracking-tight">
                   Sustainability Report
                 </h2>
@@ -276,11 +276,13 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="text-center mb-12">
-                <div className="inline-flex items-center justify-center w-40 h-40 rounded-full bg-black/5 mb-6">
-                  <span className="text-6xl font-semibold text-black">
-                    {report.overallScore}
-                  </span>
+              <div className="text-left mb-12">
+                <div className="flex items-center justify-start mb-6">
+                  <div className="flex items-center justify-center w-40 h-40 rounded-full bg-black/5">
+                    <span className="text-6xl font-semibold text-black">
+                      {report.overallScore}
+                    </span>
+                  </div>
                 </div>
                 <h3 id="overall-score-title" className="text-3xl font-semibold text-black mb-3 tracking-tight">Overall Sustainability Score</h3>
                 <p className="text-xl text-black/60 font-medium">
@@ -689,7 +691,7 @@ export default function Home() {
         )}
 
         {/* Footer */}
-        <footer className="text-center mt-24 pt-16 border-t border-black/10">
+        <footer className="text-left mt-24 pt-16 border-t border-black/10">
           <p className="text-black/40 font-medium text-lg tracking-tight">
             Built with Next.js • Promoting sustainable web development
           </p>
