@@ -127,9 +127,12 @@ export class PageSpeedAPI {
         url: url,
         key: this.apiKey,
         strategy: strategy,
-        category: ['performance', 'accessibility', 'best-practices', 'seo'].join('&category='),
         locale: 'en'
       });
+
+      // Add multiple category parameters correctly
+      const categories = ['performance', 'accessibility', 'best-practices', 'seo'];
+      categories.forEach(category => params.append('category', category));
 
       console.log('Calling PageSpeed Insights API for:', url);
       
