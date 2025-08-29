@@ -173,7 +173,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen" style={{ backgroundColor: '#F1F7E2' }}>
       <div className="container mx-auto px-6 py-16 max-w-7xl">
         {/* Header */}
         <header className="text-left mb-20 pl-12">
