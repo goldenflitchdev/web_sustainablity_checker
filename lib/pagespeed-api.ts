@@ -122,56 +122,70 @@ export class PageSpeedAPI {
       throw new Error('Google PageSpeed Insights API key is required');
     }
 
+    // Wrap everything in a comprehensive try-catch for AbortError handling
     try {
-      const params = new URLSearchParams({
-        url: url,
-        key: this.apiKey,
-        strategy: strategy,
-        locale: 'en'
-      });
-
-      // Add multiple category parameters correctly - prioritize performance for speed
-      const categories = ['performance', 'accessibility', 'best-practices', 'seo'];
-      categories.forEach(category => params.append('category', category));
-
-      console.log('Calling PageSpeed Insights API for:', url);
-      
       // Create abort controller for timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
         console.log('PageSpeed API timeout after 25 seconds, aborting...');
         controller.abort();
       }, 25000); // 25 second timeout for better production performance
-      
-      const response = await fetch(`${this.baseUrl}?${params}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-        },
-        signal: controller.signal,
-      });
 
-      clearTimeout(timeoutId);
+      try {
+        const params = new URLSearchParams({
+          url: url,
+          key: this.apiKey,
+          strategy: strategy,
+          locale: 'en'
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('PageSpeed API Error:', response.status, errorText);
-        throw new Error(`PageSpeed API Error: ${response.status} - ${errorText}`);
+        // Add multiple category parameters correctly - prioritize performance for speed
+        const categories = ['performance', 'accessibility', 'best-practices', 'seo'];
+        categories.forEach(category => params.append('category', category));
+
+        console.log('Calling PageSpeed Insights API for:', url);
+        
+        const response = await fetch(`${this.baseUrl}?${params}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('PageSpeed API Error:', response.status, errorText);
+          throw new Error(`PageSpeed API Error: ${response.status} - ${errorText}`);
+        }
+
+        const data: PageSpeedInsightsResponse = await response.json();
+        console.log('PageSpeed API response received successfully');
+
+        return this.extractPageSpeedData(data);
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        throw fetchError;
       }
-
-      const data: PageSpeedInsightsResponse = await response.json();
-      console.log('PageSpeed API response received successfully');
-
-      return this.extractPageSpeedData(data);
     } catch (error) {
       console.error('PageSpeed API analysis failed:', error);
       
-      // Handle timeout/abort errors with comprehensive detection
-      const isAbortError = error instanceof Error && (
-        error.name === 'AbortError' || 
-        (error as any).code === 20 ||
-        error.message.includes('aborted') ||
-        error.message.includes('abort')
+      // Handle ALL possible abort/timeout scenarios
+      const errorStr = String(error);
+      const errorMessage = error instanceof Error ? error.message : errorStr;
+      const errorName = error instanceof Error ? error.name : '';
+      const errorCode = (error as any)?.code;
+      
+      const isAbortError = (
+        errorName === 'AbortError' || 
+        errorCode === 20 ||
+        errorStr.includes('AbortError') ||
+        errorStr.includes('aborted') ||
+        errorStr.includes('abort') ||
+        errorMessage.includes('aborted') ||
+        errorMessage.includes('abort')
       );
       
       if (isAbortError) {
@@ -179,7 +193,7 @@ export class PageSpeedAPI {
         throw new Error('TIMEOUT_FALLBACK'); // Special error code for timeout handling
       }
       
-      throw new Error(`Failed to analyze with PageSpeed Insights: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(`Failed to analyze with PageSpeed Insights: ${errorMessage}`);
     }
   }
 
