@@ -31,7 +31,7 @@ After deployment, add your API key:
 3. Click "Environment Variables" 
 4. Add new variable:
    - **Name**: `GOOGLE_PAGESPEED_API_KEY`
-   - **Value**: `AIzaSyDrULy-pibjzvdY_ljH-p7Hp7WeHbCVoio`
+   - **Value**: `AIzaSyBBJSujaoO87fATbj4rlJaOLdSzc9JOxA8`
    - **Environments**: Production, Preview, Development
 
 5. Click "Save"
